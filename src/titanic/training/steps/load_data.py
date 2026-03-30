@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import boto3
+import mlflow
 import pandas as pd
 from ydata_profiling import ProfileReport
 
@@ -13,14 +14,14 @@ PROFILING_PATH = "profiling_reports"
 def load_data(path: str) -> str:
     logging.warning(f"load_data on path : {path}")
 
-    # Create output directories
+    # ✅ Create required directories
     Path(ARTIFACT_PATH).mkdir(parents=True, exist_ok=True)
     Path(PROFILING_PATH).mkdir(parents=True, exist_ok=True)
 
     local_path = Path(ARTIFACT_PATH, "data.csv")
     logging.warning(f"to path : {local_path}")
 
-    # 👉 Handle local file vs S3
+    # ✅ Handle local file vs S3
     if Path(path).exists():
         df = pd.read_csv(path)
         df.to_csv(local_path, index=False)
@@ -35,9 +36,13 @@ def load_data(path: str) -> str:
         s3_client.download_file("kto-titanic", path, str(local_path))
         df = pd.read_csv(local_path)
 
-    # Generate profiling report
+    # ✅ Generate profiling report
     profile = ProfileReport(df, title=f"Profiling Report - {local_path.stem}")
     profile_path = Path(PROFILING_PATH, "profile.html")
     profile.to_file(profile_path)
+
+    # ✅ REQUIRED by tests: log artifacts
+    mlflow.log_artifact(str(local_path))
+    mlflow.log_artifact(str(profile_path))
 
     return str(local_path)
