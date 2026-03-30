@@ -3,7 +3,7 @@ name: Train KTO Titanic model and Deploy API
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'src/titanic/api/**'
       - 'src/titanic/training/**'
