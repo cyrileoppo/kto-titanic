@@ -42,7 +42,9 @@ def load_data(path: str) -> str:
     profile.to_file(profile_path)
 
     # ✅ REQUIRED by tests: log artifacts
-    mlflow.log_artifact(str(local_path))
-    mlflow.log_artifact(str(profile_path))
+    mlflow.log_artifact(str(local_path), artifact_path=ARTIFACT_PATH)
+    mlflow.log_artifact(str(profile_path), artifact_path=PROFILING_PATH)
+    
+    )
 
     return str(local_path)

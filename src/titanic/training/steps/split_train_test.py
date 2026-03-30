@@ -22,21 +22,21 @@ def split_train_test(data_path: str) -> tuple[str, str, str, str]:
         x, y, test_size=0.3, random_state=42
     )
 
-    # ✅ Create directory
-    Path("dist").mkdir(parents=True, exist_ok=True)
-
     datasets = [
-        (x_train, "xtrain.csv"),
-        (x_test, "xtest.csv"),
-        (y_train, "ytrain.csv"),
-        (y_test, "ytest.csv"),
+        (x_train, "xtrain"),
+        (x_test, "xtest"),
+        (y_train, "ytrain"),
+        (y_test, "ytest"),
     ]
 
     artifact_paths = []
 
-    for data, filename in datasets:
-        file_path = Path("dist", filename)
+    for data, folder in datasets:
+        Path(folder).mkdir(parents=True, exist_ok=True)
+
+        file_path = Path(folder, f"{folder}.csv")
         data.to_csv(file_path, index=False)
-        artifact_paths.append(str(file_path))  # ✅ return str
+
+        artifact_paths.append(str(file_path))  # ✅ important
 
     return tuple(artifact_paths)
