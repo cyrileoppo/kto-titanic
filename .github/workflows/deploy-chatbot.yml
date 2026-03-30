@@ -3,7 +3,7 @@ name: Deploy Titanic Chatbot
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'src/titanic/chatbot/**'
       - '/tests/chatbot/**'
