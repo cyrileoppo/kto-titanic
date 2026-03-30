@@ -20,8 +20,8 @@ on:
 
 env:
   EXPERIMENT_NAME: kto-titanic
-  EXPERIMENT_IMAGE_NAME: quay.io/cyrileoppo/titanic/experiment
-  API_IMAGE_NAME: quay.io/cyrileoppo/titanic/api
+  EXPERIMENT_IMAGE_NAME: quay.io/kto_gthomas/titanic/experiment
+  API_IMAGE_NAME: quay.io/kto_gthomas/titanic/api
   API_ROUTE_NAME: titanic-api
   DAILYCLEAN_ROUTE_NAME: dailyclean
   MINIO_API_ROUTE_NAME: minio-api
@@ -38,7 +38,12 @@ jobs:
           python-version: 3.13
       - name: Install dependencies
         run: |
-          echo "To implement"
+          python -m pip install --upgrade pip
+          pip install uv
+          uv sync --group training --group dev
+      - name: Launch unit tests
+        run: |
+          uv run pytest tests/ci tests/training
           
           # TODO: Saisir la suite de cette pipeline. Devrait apparaître : 
           # Install depencies, Launch unit tests, Resync only training group,
@@ -48,5 +53,3 @@ jobs:
           # Download model artifact, Build and push api image, Configure API manifest with OAuth2 domain
           # Deploy api to Openshift with OAuth2 protection, Get OAuth2 token for integration test
           # Test api with OAuth2 authentication, Asleep kto-mlflow with dailyclean
-          
-          
