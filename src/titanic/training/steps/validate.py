@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, median_absolute_error
 
 # TODO : Dans une second temps, récupérer le client mlflow nous permettant de télécharger les artifacts enregistrés à l'étape précédente
-
+client = None
 def validate(model_path: str, x_test_path: str, y_test_path: str) -> None:
     logging.warning(f"validate {model_path}")
     model = joblib.load(model_path)

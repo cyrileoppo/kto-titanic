@@ -4,7 +4,7 @@ import pandas as pd
 import sklearn.model_selection
 
 # TODO : Dans une second temps, récupérer le client mlflow nous permettant de télécharger les artifacts enregistrés à l'étape précédente
-
+client = None
 FEATURES = ["Pclass", "Sex", "SibSp", "Parch"]
 TARGET = "Survived"
 

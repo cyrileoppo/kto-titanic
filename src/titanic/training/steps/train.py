@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 # TODO : Dans une second temps, récupérer le client mlflow nous permettant de télécharger les artifacts enregistrés à l'étape précédente
 
 ARTIFACT_PATH = "model_trained"
-
+client = None
 def train(x_train_path: str, y_train_path: str, n_estimators: int, max_depth: int, random_state: int) -> str:
     logging.warning(f"train {x_train_path} {y_train_path}")
     x_train = pd.read_csv(x_train_path, index_col=False)
