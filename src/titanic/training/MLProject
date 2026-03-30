@@ -1,8 +1,6 @@
 name: kto-titanic
-
 docker_env:
   image: quay.io/cyrileoppo/titanic/experiment # <--- Remplacez par votre identifiant quay.io
-  
 entry_points:
 
   main:

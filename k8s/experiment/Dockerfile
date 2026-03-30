@@ -12,17 +12,17 @@ ENV MLFLOW_S3_ENDPOINT_URL=${MLFLOW_S3_ENDPOINT_URL} \
 
 # Réduction des logs de GitPython
 ENV GIT_PYTHON_REFRESH=quiet
-
 # Définition du répertoire home pour les fichiers temporaires
 ENV HOME=/tmp
-
 # Définition du répertoire de travail dans le conteneur
 WORKDIR /app
 
 # Installation de UV (un gestionnaire de dépendances)
 RUN pip install --no-cache-dir uv
+
 # Copie des fichiers nécessaires pour installer les dépendances
 COPY pyproject.toml uv.lock README.md ./
+
 # Copie du code source nécessaire à l'exécution de l'expérience
 COPY ./src/titanic/training ./src/titanic/training
 
