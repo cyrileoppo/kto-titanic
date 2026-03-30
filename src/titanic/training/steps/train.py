@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 import joblib
+import mlflow
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
@@ -19,8 +20,12 @@ def train(
 ) -> str:
     logging.warning(f"train {x_train_path} {y_train_path}")
 
-    x_train = pd.read_csv(x_train_path, index_col=False)
-    y_train = pd.read_csv(y_train_path, index_col=False)
+    run_id = mlflow.active_run().info.run_id
+    local_x_train_path = client.download_artifacts(run_id, x_train_path)
+    local_y_train_path = client.download_artifacts(run_id, y_train_path)
+
+    x_train = pd.read_csv(local_x_train_path, index_col=False)
+    y_train = pd.read_csv(local_y_train_path, index_col=False)
 
     x_train = pd.get_dummies(x_train)
 
@@ -40,5 +45,6 @@ def train(
 
     model_path = Path(ARTIFACT_PATH, "model.joblib")
     joblib.dump(model, model_path)
+    mlflow.log_artifact(str(model_path), artifact_path=ARTIFACT_PATH)
 
     return str(model_path)

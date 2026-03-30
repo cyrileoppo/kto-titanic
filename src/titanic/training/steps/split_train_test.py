@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import mlflow
 import pandas as pd
 import sklearn.model_selection
 
@@ -10,10 +11,13 @@ FEATURES = ["Pclass", "Sex", "SibSp", "Parch"]
 TARGET = "Survived"
 
 
-def split_train_test(data_path: str) -> tuple[str, str, str, str]:
+def split_train_test(data_path: str) -> list[str]:
     logging.warning(f"split on {data_path}")
 
-    df = pd.read_csv(data_path, index_col=False)
+    run_id = mlflow.active_run().info.run_id
+    local_data_path = client.download_artifacts(run_id, data_path)
+
+    df = pd.read_csv(local_data_path, index_col=False)
 
     y = df[TARGET]
     x = df[FEATURES]
@@ -29,14 +33,15 @@ def split_train_test(data_path: str) -> tuple[str, str, str, str]:
         (y_test, "ytest"),
     ]
 
-    artifact_paths = []
+    artifact_paths: list[str] = []
 
     for data, folder in datasets:
         Path(folder).mkdir(parents=True, exist_ok=True)
 
         file_path = Path(folder, f"{folder}.csv")
         data.to_csv(file_path, index=False)
+        mlflow.log_artifact(str(file_path), artifact_path=folder)
 
-        artifact_paths.append(str(file_path))  # ✅ important
+        artifact_paths.append(str(file_path))
 
-    return tuple(artifact_paths)
+    return artifact_paths
