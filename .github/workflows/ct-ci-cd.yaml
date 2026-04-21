@@ -89,6 +89,14 @@ jobs:
         run: |
           docker build -f k8s/experiment/Dockerfile -t ${{ env.EXPERIMENT_IMAGE_NAME }}:latest --build-arg MLFLOW_S3_ENDPOINT_URL=$MINIO_API_ROUTE_URL --build-arg AWS_ACCESS_KEY_ID=${{vars.AWS_ACCESS_KEY_ID}} --build-arg AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} .
           docker push ${{ env.EXPERIMENT_IMAGE_NAME }}:latest
+
+      - name: Create Kubernetes secrets for training job
+        run: |
+          kubectl create secret docker-registry quay-pull-secret \
+            --docker-server=quay.io \
+            --docker-username="${{vars.QUAY_ROBOT_USERNAME}}" \
+            --docker-password="${{secrets.QUAY_ROBOT_TOKEN}}" \
+            --dry-run=client -o yaml | kubectl apply -f -
           
       - name: Launch mlflow training in Openshift
         timeout-minutes: 30
