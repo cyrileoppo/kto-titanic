@@ -5,7 +5,7 @@ metadata:
   namespace: cyrileoppo-dev
 spec:
   ttlSecondsAfterFinished: 100
-  backoffLimit: 1
+  backoffLimit: 0
   template:
     spec:
       containers:
