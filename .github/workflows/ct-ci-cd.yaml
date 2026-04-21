@@ -74,6 +74,16 @@ jobs:
           kubectl scale --replicas=1 deployment/dailyclean-api
           sleep 30
           curl -X POST $DAILYCLEAN_ROUTE_URL/pods/start
+          echo "Waiting for MLflow to be ready..."
+          for i in $(seq 1 20); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" $MLFLOW_TRACKING_ROUTE_URL/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "MLflow is ready."
+              break
+            fi
+            echo "Attempt $i: MLflow not ready yet (HTTP $STATUS), retrying in 15s..."
+            sleep 15
+          done
           
       - name: Build training image
         run: |
@@ -81,6 +91,7 @@ jobs:
           docker push ${{ env.EXPERIMENT_IMAGE_NAME }}:latest
           
       - name: Launch mlflow training in Openshift
+        timeout-minutes: 30
         run: |
           export KUBE_MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_ROUTE_URL
           export MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_ROUTE_URL
