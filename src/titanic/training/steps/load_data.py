@@ -7,8 +7,8 @@ import mlflow
 import pandas as pd
 from ydata_profiling import ProfileReport
 
-ARTIFACT_PATH = "path_output"
-PROFILING_PATH = "profiling_reports"
+ARTIFACT_PATH = "/tmp/path_output"
+PROFILING_PATH = "/tmp/profiling_reports"
 
 
 def load_data(path: str) -> str:

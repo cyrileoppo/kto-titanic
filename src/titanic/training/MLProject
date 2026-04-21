@@ -10,3 +10,5 @@ entry_points:
       max_depth: {type: int, default: 10}
       random_state: {type: int, default: 42}
     command: "uv -n run --no-sync -m titanic.training.main --input_data_path {path} --n_estimators {n_estimators} --max_depth {max_depth} --random_state {random_state}"
+
+    name: kto-titanic
