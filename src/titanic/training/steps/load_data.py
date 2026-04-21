@@ -1,45 +1,40 @@
 import logging
 import os
 from pathlib import Path
+import tempfile # Nouvel import pour gérer les fichiers temporaires
 
 import boto3
-import mlflow
+import mlflow # Nouvel import pour mlflow
 import pandas as pd
 from ydata_profiling import ProfileReport
 
-ARTIFACT_PATH = "/tmp/path_output"
-PROFILING_PATH = "/tmp/profiling_reports"
+
+ARTIFACT_PATH = "path_output"
+PROFILING_PATH = "profiling_reports"
 
 
 def load_data(path: str) -> str:
-    logging.warning(f"load_data on path : {path}")
+  logging.warning(f"load_data on path : {path}")
 
-    Path(ARTIFACT_PATH).mkdir(parents=True, exist_ok=True)
-    Path(PROFILING_PATH).mkdir(parents=True, exist_ok=True)
-
-    local_path = Path(ARTIFACT_PATH, "data.csv")
+  with tempfile.TemporaryDirectory() as tmp_dir: # Utilisation d'un dossier temporaire
+    local_path = Path(tmp_dir, "data.csv") # Fichier temporaire pour stocker les données
     logging.warning(f"to path : {local_path}")
 
-    if Path(path).exists():
-        df = pd.read_csv(path)
-        df.to_csv(local_path, index=False)
-    else:
-        s3_client = boto3.client(
-            "s3",
-            endpoint_url=os.environ.get("MLFLOW_S3_ENDPOINT_URL"),
-            aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
-        )
+    s3_client = boto3.client(
+      "s3",
+      endpoint_url=os.environ.get("MLFLOW_S3_ENDPOINT_URL"),
+      aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+      aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+    )
 
-        s3_client.download_file("kto-titanic", path, str(local_path))
-        df = pd.read_csv(local_path)
+    s3_client.download_file("kto-titanic", path, local_path)
+    df = pd.read_csv(local_path)
 
     profile = ProfileReport(df, title=f"Profiling Report - {local_path.stem}")
-    profile_path = Path(PROFILING_PATH, "profile.html")
-    profile.to_file(profile_path)
+    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp_file: # Fichier temporaire pour le rapport de profiling
+      profile.to_file(tmp_file.name)
+      mlflow.log_artifact(tmp_file.name, PROFILING_PATH) # Log du rapport de profiling dans mlflow
 
-    # ✅ Correct MLflow calls (NO extra parenthesis)
-    mlflow.log_artifact(str(local_path), artifact_path=ARTIFACT_PATH)
-    mlflow.log_artifact(str(profile_path), artifact_path=PROFILING_PATH)
+    mlflow.log_artifact(str(local_path), ARTIFACT_PATH) # Log du fichier de données dans mlflow
 
-    return str(local_path)
+  return f"{ARTIFACT_PATH}/{local_path.name}" # Retourne le chemin dans mlflow
