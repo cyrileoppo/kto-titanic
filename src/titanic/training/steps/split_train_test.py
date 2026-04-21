@@ -5,7 +5,7 @@ import mlflow
 import pandas as pd
 import sklearn.model_selection
 
-client = None
+client = mlflow.MlflowClient()
 
 FEATURES = ["Pclass", "Sex", "SibSp", "Parch"]
 TARGET = "Survived"

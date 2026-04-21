@@ -78,6 +78,7 @@ jobs:
       - name: Build training image
         run: |
           docker build -f k8s/experiment/Dockerfile -t ${{ env.EXPERIMENT_IMAGE_NAME }}:latest --build-arg MLFLOW_S3_ENDPOINT_URL=$MINIO_API_ROUTE_URL --build-arg AWS_ACCESS_KEY_ID=${{vars.AWS_ACCESS_KEY_ID}} --build-arg AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} .
+          docker push ${{ env.EXPERIMENT_IMAGE_NAME }}:latest
           
       - name: Launch mlflow training in Openshift
         run: |

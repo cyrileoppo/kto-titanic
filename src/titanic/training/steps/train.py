@@ -6,7 +6,7 @@ import mlflow
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
-client = None
+client = mlflow.MlflowClient()
 
 ARTIFACT_PATH = "model_trained"
 

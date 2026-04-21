@@ -6,7 +6,7 @@ import pandas as pd
 from mlflow.models import infer_signature
 from sklearn import metrics
 
-client = None
+client = mlflow.MlflowClient()
 
 
 def validate(model_path: str, x_test_path: str, y_test_path: str) -> None:
